@@ -71,9 +71,9 @@ class Title extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(400, 300, 'test');
+    this.add.image(Preset.config.width / 2, Preset.config.height / 2, 'test');
     const change = this.add
-      .text(400, 300, 'changeA', {
+      .text(Preset.config.width / 2, Preset.config.height / 2, 'title', {
         fontFamily: Preset.style.fontFamily,
         fontSize: 50,
       })

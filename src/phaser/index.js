@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import preset from './preset';
-import Title from './scene/title';
-import Play from './scene/play';
-import Result from './scene/result';
+import Title from './scenes/title';
+import Play from './scenes/play';
+import Result from './scenes/result';
 
 const config = { ...preset.config, scene: [Title, Play, Result] };
 

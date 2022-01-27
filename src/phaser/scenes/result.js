@@ -10,8 +10,11 @@ class Result extends Phaser.Scene {
 
   create() {
     const change = this.add
-      .text(400, 300, 'changeC', { fontFamily: Preset.style.fontFamily })
-      .setFontSize(30)
+      .text(Preset.config.width / 2, Preset.config.height / 2, 'result', {
+        fontFamily: Preset.style.fontFamily,
+        fontSize: 50,
+      })
+      .setOrigin(0.5)
       .setInteractive();
     change.on(
       'pointerdown',

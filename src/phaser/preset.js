@@ -3,9 +3,9 @@ import Phaser from 'phaser';
 const preset = {
   config: {
     type: Phaser.AUTO,
-    width: 800,
+    width: 400,
     height: 600,
-    maxWidth: 800,
+    maxWidth: 400,
     maxHeight: 600,
     pixelArt: true,
     scale: {
