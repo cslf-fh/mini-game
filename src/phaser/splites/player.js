@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 
 class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, texture, animation) {
+  constructor(scene, x, y, texture, animation, scale) {
     super(scene, x, y, texture);
 
     scene.add.existing(this); // シーンに追加
     scene.physics.add.existing(this); // 物理判定を追加
 
-    this.setScale(5);
+    this.setScale(scale);
     //this.setImmovable(true); // 描画時にオブジェクトを固定
     this.body.setAllowGravity(false); // オブジェクトが重力の影響を受けないように
 
