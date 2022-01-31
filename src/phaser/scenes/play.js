@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Preset from '../preset';
 import Player from '../splites/player';
 import Enemy from '../splites/enemy';
+import Star from '../splites/star';
 
 /*
 5レーンを移動しながら上から落ちてくる敵機を避けるゲーム
@@ -19,6 +20,14 @@ class Play extends Phaser.Scene {
     this.LANE = {}; // レーンに関するプロパティ
     this.IS_PLAYING = true; // 操作可能かどうか
     this.TIMER; // タイマー
+    /* 背景に関するプロパティ */
+    this.BG = {
+      number: 3, // レイヤの数
+      quanity: 50, // スプライトの個数
+      scale: 0.2, // スプライトの拡大率
+      incY: 0.01, // スプライトのy軸への移動距離
+      layers: [], // 作成したレイヤの配列
+    };
   }
 
   preload() {
@@ -35,6 +44,7 @@ class Play extends Phaser.Scene {
       frameWidth: this.SIZE,
       frameHeight: this.SIZE,
     });
+    this.load.image('star', './assets/images/star.png');
   }
 
   create() {
@@ -77,6 +87,16 @@ class Play extends Phaser.Scene {
         this.SCALE
       );
     });
+    /* 背景のレイヤを作成 */
+    for (let i = 0; i < this.BG.number; i++) {
+      this.BG.layers[i] = this.add.group(); // 作成するレイヤをグループ化
+      /* 作成したグループにスプライトを追加 */
+      this.createLayer(
+        this.BG.layers[i],
+        this.BG.quanity,
+        this.BG.scale + (this.BG.scale / 4) * i
+      );
+    }
 
     const change = this.add
       .text(this.WIDTH / 2, this.HEIGHT / 2, 'play', {
@@ -95,6 +115,10 @@ class Play extends Phaser.Scene {
   }
 
   update() {
+    /* 背景を動かす */
+    for (let i = 0; i < this.BG.number; i++) {
+      this.BG.layers[i].incY(this.BG.incY + this.BG.incY * i);
+    }
     const x = this.PLAYER.x; // 自機のx座標
     const pointer = this.input.activePointer; // クリックorタッチ位置のx座標
     /* ゲーム画面内をクリックされたかどうかを判定 */
@@ -129,6 +153,14 @@ class Play extends Phaser.Scene {
     this.ENEMY.add(
       new Enemy(this, x, -100, 'enemy', 'default', this.SCALE, randF)
     );
+  }
+
+  createLayer(arr, num, scale) {
+    for (let i = 0; i < num; i++) {
+      const x = Phaser.Math.Between(0, 400);
+      const y = Phaser.Math.Between(-600, 600);
+      arr.add(new Star(this, x, y, 'star', scale));
+    }
   }
 }
 
