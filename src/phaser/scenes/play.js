@@ -36,11 +36,11 @@ class Play extends Phaser.Scene {
     this.LANE.padding = this.SIZE / 2; // レーン間の余白
     this.LANE.distance = this.LANE.width + this.LANE.padding; // レーン間の距離
 
-    this.load.spritesheet('player', './assets/images/objects/player.png', {
+    this.load.spritesheet('player', './assets/images/spritesheets/player.png', {
       frameWidth: this.SIZE,
       frameHeight: this.SIZE,
     });
-    this.load.spritesheet('enemy', './assets/images/objects/enemy.png', {
+    this.load.spritesheet('enemy', './assets/images/spritesheets/enemy.png', {
       frameWidth: this.SIZE,
       frameHeight: this.SIZE,
     });

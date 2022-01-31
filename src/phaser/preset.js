@@ -22,7 +22,7 @@ const preset = {
     },
   },
   style: {
-    fontFamily: `'Noto Sans JP', sans-serif`,
+    fontFamily: `'DotGothic16', sans-serif`,
   },
 };
 
