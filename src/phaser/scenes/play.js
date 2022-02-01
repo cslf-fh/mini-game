@@ -62,6 +62,11 @@ class Play extends Phaser.Scene {
     this.SCORE_TEXT; // スコア表示用のテキスト
   }
 
+  init() {
+    this.IS_PLAYING = true;
+    this.SCORE = 0;
+  }
+
   preload() {
     this.load.spritesheet('player', './assets/images/spritesheets/player.png', {
       frameWidth: SIZE,
@@ -81,8 +86,6 @@ class Play extends Phaser.Scene {
   }
 
   create() {
-    this.IS_PLAYING = true; // 操作可能に
-    this.SCORE = 0; // スコアの初期化
     /* 自機の描画 */
     PLAYER = new Player(
       this,
