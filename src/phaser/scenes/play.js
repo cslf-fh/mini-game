@@ -144,13 +144,18 @@ class Play extends Phaser.Scene {
         'damaged',
         SCALE
       );
+      /* シーン変更のタイマーの設定 */
+      const sceneChange = this.time.addEvent({
+        delay: 3000,
+      });
+      sceneChange.callback = () => {
+        this.scene.start('Result', { score: this.SCORE }); // 結果画面へ
+      };
     });
-
+    /* for debug */
+    /*
     const change = this.add
-      .text(WIDTH / 2, HEIGHT / 2, 'play', {
-        fontFamily: Preset.style.fontFamily,
-        fontSize: 50,
-      })
+      .text(WIDTH / 2, HEIGHT / 2, 'play')
       .setOrigin(0.5)
       .setInteractive();
     change.on(
@@ -160,6 +165,7 @@ class Play extends Phaser.Scene {
       },
       this
     );
+    */
   }
 
   update() {
