@@ -4,11 +4,17 @@ import Preset from '../preset';
 class Result extends Phaser.Scene {
   constructor() {
     super({ key: 'Result' });
+    this.SCORE;
+  }
+
+  init(data) {
+    this.SCORE = data.score;
   }
 
   preload() {}
 
   create() {
+    this.add.text(0, 0, this.SCORE);
     const change = this.add
       .text(Preset.config.width / 2, Preset.config.height / 2, 'result', {
         fontFamily: Preset.style.fontFamily,

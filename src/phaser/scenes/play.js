@@ -153,7 +153,7 @@ class Play extends Phaser.Scene {
     change.on(
       'pointerdown',
       () => {
-        this.scene.start('Result');
+        this.scene.start('Result', { score: this.SCORE });
       },
       this
     );
