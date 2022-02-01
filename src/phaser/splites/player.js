@@ -8,6 +8,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this); // 物理判定を追加
 
     this.setScale(scale);
+    this.setDepth(1);
     //this.setImmovable(true); // 描画時にオブジェクトを固定
     this.body.setAllowGravity(false); // オブジェクトが重力の影響を受けないように
 

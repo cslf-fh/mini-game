@@ -15,14 +15,14 @@ const HEIGHT = Preset.config.height; // 画面の高さ
 const ENEMY_Y = -100;
 const SIZE = 32; // スプライトのサイズ
 const SCALE = 2; // スプライトの拡大率
-/* レーンに関するプロパティ */
+/* レーンのプロパティ */
 const LANE = {
   width: SIZE * SCALE, // レーンの幅
   padding: SIZE / 2, // レーン間の余白
   distance: SIZE * SCALE + SIZE / 2, // レーン間の距離
 };
 let TIMER; // タイマー
-/* 背景に関するプロパティ */
+/* 背景のプロパティ */
 const BG = {
   number: 3, // レイヤの数
   quanity: 50, // スプライトの個数
@@ -30,11 +30,36 @@ const BG = {
   incY: 0.01, // スプライトのy軸への移動距離
   layers: [], // 作成したレイヤの配列
 };
+/* スコアを表示するラベルのプロパティ */
+const LABEL = {
+  x: 70,
+  y: 44,
+  width: 150,
+  height: 50,
+  orientation: 0,
+  depth: 1,
+  color: 0x2681c8,
+  alpha: 0.8,
+  round: [0, 0, 1, 1, 10],
+  text: {
+    value: 'score:',
+    size: 24,
+    align: 'left',
+  },
+  space: {
+    left: 54,
+    right: 16,
+    top: 16,
+    bottom: 16,
+  },
+};
 
 class Play extends Phaser.Scene {
   constructor() {
     super({ key: 'Play' });
-    this.IS_PLAYING = true; // 操作可能かどうか
+    this.IS_PLAYING; // 操作可能かどうか
+    this.SCORE; // スコア
+    this.SCORE_TEXT; // スコア表示用のテキスト
   }
 
   preload() {
@@ -47,9 +72,17 @@ class Play extends Phaser.Scene {
       frameHeight: SIZE,
     });
     this.load.image('star', './assets/images/star.png');
+    this.load.scenePlugin(
+      'rexuiplugin',
+      'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
+      'rexUI',
+      'rexUI'
+    );
   }
 
   create() {
+    this.IS_PLAYING = true; // 操作可能に
+    this.SCORE = 0; // スコアの初期化
     /* 自機の描画 */
     PLAYER = new Player(
       this,
@@ -69,15 +102,35 @@ class Play extends Phaser.Scene {
     TIMER.callback = () => {
       this.createEnemy(); // 敵機の生成
       this.time.timeScale += 0.1; // ゲームスピードの更新
+      this.SCORE += 100; // スコアを加算
     };
+    /* 背景のレイヤを作成 */
+    for (let i = 0; i < BG.number; i++) {
+      BG.layers[i] = this.add.group(); // 作成するレイヤをグループ化
+      /* 作成したグループにスプライトを追加 */
+      this.createLayer(BG.layers[i], BG.quanity, BG.scale + (BG.scale / 4) * i);
+    }
+    /* スコアを表示するラベルの作成 */
+    this.SCORE_TEXT = this.createLabel(this, `${LABEL.text.value}000000`); // スコアテキストを更新する用の変数
+    const label = this.rexUI.add
+      .sizer({
+        x: LABEL.x,
+        y: LABEL.y,
+        width: LABEL.width,
+        height: LABEL.height,
+        orientation: LABEL.orientation,
+      })
+      .add(this.SCORE_TEXT, 1, LABEL.text.align)
+      .layout();
+    label.setDepth(LABEL.depth); // ラベルが前面に来るように
 
     this.physics.add.collider(PLAYER, ENEMY); // 当たり判定の追加
     /* 自機と敵機が衝突時 */
-    this.physics.add.overlap(PLAYER, ENEMY, (p) => {
+    this.physics.add.overlap(PLAYER, ENEMY, async (p) => {
       this.physics.pause(); // 敵機の移動を停止
-      this.time.timeScale = 1; // ゲームスピードの初期化
       this.IS_PLAYING = false; // 自機を操作不能に
-      TIMER.remove(); // タイマーの除去
+      await TIMER.remove(); // タイマーの除去
+      this.time.timeScale = 1; // ゲームスピードの初期化
       /* 自機の画像の差し替え */
       p.destroy();
       PLAYER = new Player(
@@ -89,12 +142,6 @@ class Play extends Phaser.Scene {
         SCALE
       );
     });
-    /* 背景のレイヤを作成 */
-    for (let i = 0; i < BG.number; i++) {
-      BG.layers[i] = this.add.group(); // 作成するレイヤをグループ化
-      /* 作成したグループにスプライトを追加 */
-      this.createLayer(BG.layers[i], BG.quanity, BG.scale + (BG.scale / 4) * i);
-    }
 
     const change = this.add
       .text(WIDTH / 2, HEIGHT / 2, 'play', {
@@ -113,6 +160,10 @@ class Play extends Phaser.Scene {
   }
 
   update() {
+    /* 表示用のスコアテキストの更新 */
+    const scoreText = this.createScoreText(this.SCORE);
+    this.SCORE_TEXT.setText(LABEL.text.value + scoreText);
+
     /* 背景を動かす */
     for (let i = 0; i < BG.number; i++) {
       BG.layers[i].incY(BG.incY + BG.incY * i);
@@ -157,6 +208,28 @@ class Play extends Phaser.Scene {
       const y = Phaser.Math.Between(HEIGHT * -1, HEIGHT);
       arr.add(new Star(this, x, y, 'star', scale));
     }
+  }
+
+  createLabel(scene, text) {
+    return scene.rexUI.add.label({
+      background: scene.rexUI.add.roundRectangle(
+        ...LABEL.round,
+        LABEL.color,
+        LABEL.alpha
+      ),
+      text: scene.add.text(0, 0, text, {
+        fontFamily: Preset.style.fontFamily,
+        fontSize: LABEL.text.size,
+      }),
+      align: LABEL.text.align,
+      space: { ...LABEL.space },
+    });
+  }
+
+  createScoreText(score) {
+    const text = '000000';
+    const val = String(score);
+    return text.slice(0, text.length - val.length) + val; // スコアの表示が"000xyz"な感じになるように整形
   }
 }
 
