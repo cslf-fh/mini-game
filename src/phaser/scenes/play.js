@@ -42,7 +42,7 @@ const LABEL = {
   alpha: 0.8,
   round: [0, 0, 1, 1, 10],
   text: {
-    value: 'score:',
+    value: 'SCORE:',
     size: 24,
     align: 'left',
   },
