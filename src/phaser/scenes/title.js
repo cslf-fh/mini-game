@@ -1,5 +1,10 @@
 import Phaser from 'phaser';
 import Preset from '../preset';
+import Player from '../splites/player';
+
+const WIDTH = Preset.config.width;
+const HEIGHT = Preset.config.height;
+const FONT_FAMILY = Preset.style.fontFamily;
 
 class Title extends Phaser.Scene {
   constructor() {
@@ -66,26 +71,47 @@ class Title extends Phaser.Scene {
       assetText.destroy();
     });
     */
-
-    this.load.image('test', './assets/images/test.png');
+    this.load.spritesheet('player', './assets/images/spritesheets/player.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
   }
 
   create() {
-    this.add.image(Preset.config.width / 2, Preset.config.height / 2, 'test');
-    const change = this.add
-      .text(Preset.config.width / 2, Preset.config.height / 2, 'title', {
-        fontFamily: Preset.style.fontFamily,
-        fontSize: 50,
-      })
-      .setOrigin(0.5)
-      .setInteractive();
-    change.on(
-      'pointerdown',
-      () => {
-        this.scene.start('Play');
-      },
-      this
+    const chara = new Player(
+      this,
+      WIDTH / 2,
+      HEIGHT / 2,
+      'player',
+      'default',
+      2
     );
+    chara.body.setVelocityX(100).setBounceX(1).setCollideWorldBounds(true); // 画面内を自動で横反復移動
+
+    this.add
+      .text(WIDTH / 2, HEIGHT / 2 - 150, 'SCORE >= 300', {
+        fontFamily: FONT_FAMILY,
+        fontSize: 60,
+      })
+      .setOrigin(0.5);
+    const toStart = this.add
+      .text(WIDTH / 2, HEIGHT / 2 + 150, 'TOUCH TO START', {
+        fontFamily: FONT_FAMILY,
+        fontSize: 24,
+      })
+      .setOrigin(0.5);
+    this.tweens.add({
+      targets: toStart,
+      alpha: 0,
+      duration: 500,
+      delay: 500,
+      yoyo: true,
+      loop: -1,
+    });
+    /* 画面押下でシーン変更 */
+    this.input.on('pointerdown', () => {
+      this.scene.start('Play');
+    });
   }
 }
 
