@@ -35,9 +35,11 @@ class Result extends Phaser.Scene {
   }
 
   init(data) {
-    //this.SCORE = data.score; // ゲーム画面からスコアを受け取る
-    this.SCORE = 10000;
-    console.log(data);
+    const text = (this.SCORE = '000000');
+    if (Object.keys(data).length) {
+      const val = String(data.score);
+      this.SCORE = text.slice(0, text.length - val.length) + val;
+    }
   }
 
   preload() {
