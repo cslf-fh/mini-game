@@ -75,6 +75,8 @@ class Title extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.audio('title', './assets/bgm/title.wav');
+    this.load.audio('start', './assets/bgm/start.mp3');
   }
 
   create() {
@@ -108,8 +110,14 @@ class Title extends Phaser.Scene {
       yoyo: true,
       loop: -1,
     });
+
+    const bgmTitle = this.sound.add('title', { loop: true });
+    bgmTitle.play();
+
     /* 画面押下でシーン変更 */
     this.input.on('pointerdown', () => {
+      bgmTitle.stop();
+      this.sound.play('start');
       this.scene.start('Play');
     });
   }

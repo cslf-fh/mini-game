@@ -83,6 +83,8 @@ class Play extends Phaser.Scene {
       'rexUI',
       'rexUI'
     );
+    this.load.audio('play', './assets/bgm/play.wav');
+    this.load.audio('damaged', './assets/bgm/damaged.mp3');
   }
 
   create() {
@@ -128,12 +130,18 @@ class Play extends Phaser.Scene {
     label.setDepth(LABEL.depth); // ラベルが前面に来るように
 
     this.physics.add.collider(PLAYER, ENEMY); // 当たり判定の追加
+
+    const bgmPlay = this.sound.add('play'); // BGMの追加
+    bgmPlay.play({ loop: true, delay: 0.5 }); // BGMの再生
+
     /* 自機と敵機が衝突時 */
     this.physics.add.overlap(PLAYER, ENEMY, async (p) => {
       this.physics.pause(); // 敵機の移動を停止
       this.IS_PLAYING = false; // 自機を操作不能に
       await TIMER.remove(); // タイマーの除去
       this.time.timeScale = 1; // ゲームスピードの初期化
+      bgmPlay.stop(); // BGMの停止
+      this.sound.play('damaged'); // 被弾時のSEの再生
       /* 自機の画像の差し替え */
       p.destroy();
       PLAYER = new Player(

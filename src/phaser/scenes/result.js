@@ -56,6 +56,8 @@ class Result extends Phaser.Scene {
       'rexSpinner',
       'rexSpinner'
     );
+    this.load.audio('result', './assets/bgm/result.mp3');
+    this.load.audio('start', './assets/bgm/start.mp3');
   }
 
   create() {
@@ -101,6 +103,8 @@ class Result extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive();
 
+    this.sound.play('result', { rate: 0.5 });
+
     toTop.on(
       'pointerdown',
       () => {
@@ -111,6 +115,7 @@ class Result extends Phaser.Scene {
     retry.on(
       'pointerdown',
       () => {
+        this.sound.play('start');
         this.scene.start('Play');
       },
       this

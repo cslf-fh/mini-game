@@ -20,6 +20,9 @@ const preset = {
         gravity: { y: 200 },
       },
     },
+    audio: {
+      disableWebAudio: true,
+    },
   },
   style: {
     fontFamily: `'DotGothic16', sans-serif`,
