@@ -35,10 +35,10 @@ class Result extends Phaser.Scene {
   }
 
   init(data) {
-    const text = (this.SCORE = '000000');
     if (Object.keys(data).length) {
-      const val = String(data.score);
-      this.SCORE = text.slice(0, text.length - val.length) + val;
+      this.SCORE = data.score;
+    } else {
+      this.SCORE = '000000';
     }
   }
 
@@ -83,10 +83,15 @@ class Result extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(WIDTH / 2, HEIGHT / 2 - 100, `YOUR SCORE : ${this.SCORE}`, {
-        fontFamily: FONT_FAMILY,
-        fontSize: 36,
-      })
+      .text(
+        WIDTH / 2,
+        HEIGHT / 2 - 100,
+        `YOUR SCORE : ${this.createScoreText(this.SCORE)}`,
+        {
+          fontFamily: FONT_FAMILY,
+          fontSize: 36,
+        }
+      )
       .setOrigin(0.5);
     const toTop = this.add
       .text(WIDTH / 2 - WIDTH / 4, HEIGHT / 2 + 100, 'TO TOP', {
@@ -133,28 +138,12 @@ class Result extends Phaser.Scene {
     shareButton.on(
       'button.click',
       () => {
-        /* モーダルとローディングスピナの描画 */
-        const modal = this.add.rectangle(
-          WIDTH / 2,
-          HEIGHT / 2,
-          WIDTH,
-          HEIGHT,
-          0x000000,
-          0.5
-        );
-        modal.setDepth(1).setInteractive(); // インタラクティブにして他のボタンを操作不可に
-        const spinner = this.rexSpinner.add.bars({
-          x: WIDTH / 2,
-          y: HEIGHT / 2,
-          width: 64,
-          height: 64,
-          color: 0xffffff,
-        });
-        spinner.setDepth(1);
+        /* ゲーム画面のスナップショットを取得 */
         this.renderer.snapshot(async (image) => {
           const img = image.src.replace(/^data:image\/png;base64,/, ''); // base64の整形
           let imageUrl = ''; // シェア画像のURL
           const postImage = httpsCallable(functions, 'postImage'); // 画像を投稿する関数
+          const modal = this.createModal(); // モーダルの描画
           /* 画像を投稿 */
           await postImage({ image: img })
             .then(async (res) => {
@@ -162,13 +151,12 @@ class Result extends Phaser.Scene {
             })
             .catch(() => {}); // 投稿に失敗しても処理続行
           const baseUrl = 'https://twitter.com/intent/tweet?'; // ツイッターのシェアURL
-          const text = `スコアは${this.SCORE}点でした。`; // シェアツイートのテキスト
-          const pageUrl = 'https://score-300.web.app/';
-          const shareUrl = `${baseUrl}text=${text}&url=${imageUrl}%20${pageUrl}`; // 最終的なシェアURL
+          const text = `私のスコアは${this.SCORE}点でした！\n#SCORE300`; // シェアツイートのテキスト
+          const encodedText = encodeURIComponent(text); // テキストをエンコード
+          const pageUrl = 'https://score-300.web.app/'; // WebページのURL
+          const shareUrl = `${baseUrl}text=${encodedText}&url=${imageUrl}%20${pageUrl}`; // 最終的なシェアURL
           window.open(shareUrl); // ツイート画面を開く
-          /* モーダルとスピナを削除 */
-          modal.destroy();
-          spinner.destroy();
+          modal.destroy(true); // モーダルの削除
         });
       },
       this
@@ -194,6 +182,35 @@ class Result extends Phaser.Scene {
       align: SHARE_BUTTON.text.align,
       space: { ...SHARE_BUTTON.space },
     });
+  }
+
+  createModal() {
+    const overlay = this.add.rectangle(
+      WIDTH / 2,
+      HEIGHT / 2,
+      WIDTH,
+      HEIGHT,
+      0x000000,
+      0.5
+    );
+    overlay.setInteractive(); // インタラクティブにして他のボタンを操作不可に
+    const spinner = this.rexSpinner.add.bars({
+      x: WIDTH / 2,
+      y: HEIGHT / 2,
+      width: 64,
+      height: 64,
+      color: 0xffffff,
+    });
+    const modal = this.add.group();
+    modal.addMultiple([overlay, spinner]);
+    modal.setDepth(1);
+    return modal;
+  }
+
+  createScoreText(score) {
+    const text = '000000';
+    const val = String(score);
+    return text.slice(0, text.length - val.length) + val;
   }
 }
 
